@@ -1,56 +1,65 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponse, Http404
+from rest_framework import viewsets, permissions, mixins
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 import json, random
 
+from .serializers import *
 from .models import Ref, Node
 
-def raiseIfNot(request, method):
-    if request.method != method:
-        raise Http404('well you are dumb')
+class NodeViewSet(viewsets.ModelViewSet):
+    queryset = Node.objects.all()
+    serializer_class = NodeSerializer
+    permission_classes = [permissions.AllowAny]
 
-def nodeObj(node):
-    obj = {}
-    obj['name'] = node.name
-    obj['body'] = node.body
-    obj['votes'] = node.votes
-    return obj
+    @action(detail=False, methods=['get'])
+    def get_random_node(self, request, *args, **kwargs):
+        instance = random.choice(self.queryset)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
-def getRandomNode(request):
-    raiseIfNot(request, 'GET')
-    nodes = Node.objects.all()
-    random_node = random.choice(nodes)
-    return JsonResponse({ 'name' : random_node.name })
+    @action(detail=True, methods=['get'])
+    def get_all_refs(self, request, *args, **kwargs):
+        instance = self.get_object()
+        refs = instance.refs.all().order_by('votes')
+        response = []
+        for ref in refs:
+            response.append(ref)
+        return Response(RefSerializer(response, many=True, context={'request': request}).data)
 
-def getNode(request, name):
-    raiseIfNot(request, 'GET')
-    node = get_object_or_404(Node, pk=name)
-    return JsonResponse(nodeObj(node))
+    @action(detail=True, methods=['get'])
+    def query_node(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response(instance.get_child_nodes())
+    
+    # @action(detail=True, methods=['post'])
+    # def post_upvote_node(self, request, *args, **kwargs):
+    #     instance = self.get_object()
 
-def addNode(request):
-    raiseIfNot(request, 'POST')
-    data = json.loads(request.body)
-    new_node = Node(name=data['name'], body=data['body'])
-    if new_node.save():
-        return JsonResponse({'saved':'hehe'})
-    else:
-        return JsonResponse({'notsaved':'hehe'})
 
-def upvoteNode(request, name):
-    pass
-def downvoteNode(request, name):
-    pass
-def upvoteRef(request, name, ref):
-    pass
-def downvoteRef(request, name, ref):
-    pass
-def addRef(request, name):
-    pass
-def getRefs(request, name):
-    pass
+class RefViewSet(viewsets.ModelViewSet):
+    queryset = Ref.objects.all()
+    serializer_class = RefSerializer
+    permission_classes = [permissions.AllowAny]
 
-def index(request):
-    raiseIfNot('GET')
-    return JsonResponse({ 'batata': "Hello, world. You're at the polls index." })
+
+# def upvoteNode(request, name):
+#     pass
+# def downvoteNode(request, name):
+#     pass
+# def upvoteRef(request, name, ref):
+#     pass
+# def downvoteRef(request, name, ref):
+#     pass
+# def addRef(request, name):
+#     pass
+# def getRefs(request, name):
+#     pass
+
+# def index(request):
+#     raiseIfNot('GET')
+#     return JsonResponse({ 'batata': "Hello, world. You're at the polls index." })
 
 
