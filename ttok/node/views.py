@@ -1,10 +1,8 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse, HttpResponse, Http404
 from rest_framework import viewsets, permissions, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-import json, random
+import random
 
 from .serializers import *
 from .models import Ref, Node
@@ -34,9 +32,11 @@ class NodeViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         return Response(instance.get_child_nodes())
     
+    # TODO: complete authentication before this
     # @action(detail=True, methods=['post'])
     # def post_upvote_node(self, request, *args, **kwargs):
     #     instance = self.get_object()
+    #     instance.votes = instance.votes
 
 
 class RefViewSet(viewsets.ModelViewSet):
