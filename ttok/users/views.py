@@ -10,6 +10,12 @@ from .serializers import (
     UserRegisterSerializer,
     UserProfileSerializer,
     UserProfileUpdateSerializer,
+    UsernameSerializer
+)
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
 )
 
 from .permissions import IsOwner
@@ -32,3 +38,13 @@ class UserUpdateProfile(generics.UpdateAPIView):
     queryset = User.objects.all()
 
     lookup_field = 'username'
+
+class GetUsername(generics.RetrieveAPIView):
+    permission_classes = (IsOwner, )
+    serializer_class = UsernameSerializer
+    queryset = User.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.request.user.username
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

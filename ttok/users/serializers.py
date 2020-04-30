@@ -75,3 +75,10 @@ class UserProfileUpdateSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             'bio'
         ]
+
+class UsernameSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        filds = [
+            'username'
+        ]

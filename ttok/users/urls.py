@@ -3,7 +3,8 @@ from rest_framework import routers
 from .views import (
     UserRegister,
     UserProfile,
-    UserUpdateProfile
+    UserUpdateProfile,
+    GetUsername
 )
 
 appname = 'users'
@@ -23,5 +24,10 @@ urlpatterns = [
         r'profileupdate/<str:username>',
         UserUpdateProfile.as_view(),
         name='profileupdate'
+    ),
+    path(
+        r'getusername/',
+        GetUsername.as_view(),
+        name='getusername'
     ),
 ]
