@@ -25,9 +25,6 @@ SECRET_KEY = 'obn9#cbd1qss6^@4a7k&imuysr-!a1otn#m9s6xtiq$zx@8ifm'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +40,15 @@ INSTALLED_APPS = [
     'users',
 # Libs
     'rest_framework',
+    'corsheaders',
+    'rest_framework_simplejwt',
+]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    'localhost'
 ]
 
 REST_FRAMEWORK = {
@@ -51,6 +57,7 @@ REST_FRAMEWORK = {
     )
 }
 MIDDLEWARE = [
+# Default Django
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +65,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+# Libs
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'ttok.urls'

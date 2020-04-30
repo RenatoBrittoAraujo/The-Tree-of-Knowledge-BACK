@@ -15,12 +15,12 @@ urlpatterns = [
         name='register'
     ),
     path(
-        r'profile/<str:pk>',
+        r'profile/<str:username>',
         UserProfile.as_view(),
         name='profile'
     ),
     path(
-        r'profileupdate/<str:pk>',
+        r'profileupdate/<str:username>',
         UserUpdateProfile.as_view(),
         name='profileupdate'
     ),

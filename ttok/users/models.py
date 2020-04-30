@@ -10,7 +10,7 @@ from .managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
-    username = models.CharField(_('user name'), primary_key=True, max_length=40, blank=False, null=False)
+    username = models.CharField(_('user name'), max_length=40, blank=False, null=False)
     bio = models.CharField(_('user bio'), max_length=200, blank=True, null=True)
     contributionpoints = models.IntegerField(default=0)
 
