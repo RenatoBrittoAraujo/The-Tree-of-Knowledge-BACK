@@ -9,7 +9,9 @@ from .viewsets import (
     AddNode,
     EditNode,
     AddEdge,
-    AddRef
+    AddRef,
+    VoteNode,
+    VoteRef
 )
 
 appname = 'nodes'
@@ -55,5 +57,14 @@ urlpatterns = [
         AddRef.as_view(),
         name='addref'
     ),
-    
+    path(
+        r'votenode/<int:pk>',
+        VoteNode.as_view(),
+        name='votenode'
+    ),
+    path(
+        r'voteref/<int:pk>',
+        VoteRef.as_view(),
+        name='voteref'
+    ),
 ]

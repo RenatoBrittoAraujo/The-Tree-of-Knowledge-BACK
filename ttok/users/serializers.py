@@ -59,7 +59,7 @@ class UserRegisterSerializer(serializers.Serializer):
 
         return user
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
@@ -69,14 +69,14 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
             'contributions',
         ]
 
-class UserProfileUpdateSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             'bio'
         ]
 
-class UsernameSerializer(serializers.HyperlinkedModelSerializer):
+class UsernameSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         filds = [

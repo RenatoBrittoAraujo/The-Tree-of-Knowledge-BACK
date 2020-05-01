@@ -1,7 +1,8 @@
-from rest_framework import permissions, mixins, filters, generics, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
-
+from rest_framework import (
+    permissions, mixins, 
+    filters, generics, status
+)
 import random
 from .models import Ref, Node, Edge
 
@@ -14,19 +15,10 @@ from .serializers import (
     FullNodeSerializer,
     EdgeSerializer,
     RefSerializer,
+    NodeEditSerializer,
+    RefEditSerializer
 )
 
-# GET queryNode(id) - done
-# GET getNode(id) - done
-# GET getRandomNode() - done
-# GET reportNode(id) - done
-# POST addNode(id, body) - done
-# POST addEdge(from, to) - done
-# POST addRef(id, title)
-# PUT/PATCH editNode(id, data) 
-# PUT/PATCH editRef(id, data) 
-# GET upvoteNode(id), downvoteNode(id)
-# GET upvoteRef(nodeName, refID), downvoteRef(nodeName, refID)
 # NODE SEARCH - https://medium.com/quick-code/searchfilter-using-django-and-vue-js-215af82e12cd
 
 class QueryNode(generics.RetrieveAPIView):
@@ -44,6 +36,44 @@ class GetNode(generics.RetrieveAPIView):
     queryset = Node.objects.all()
     serializer_class = FullNodeSerializer
     permission_classes = [permissions.AllowAny]
+
+class VoteNode(generics.GenericAPIView):
+    queryset = Node.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk=None):
+        if not pk: return Response(False)
+        if not Node.objects.filter(pk=pk).exists():
+            return Response(False)
+        if not 'parent' in request.data.keys():
+            return Response(False)
+        if not 'voteparam' in request.data.keys():
+            return Response(False)
+        node = Node.objects.filter(pk=pk).first()
+        parent = request.data['parent']
+        voteparam = request.data['voteparam']
+        if not Node.objects.filter(pk=parent).exists():
+            return Response(False)
+        parent = Node.objects.filter(pk=parent).first()
+        if voteparam != '1' and voteparam != '-1' and voteparam != '0':
+            return Response(False)
+        return Response(node.vote(parent, request.user, voteparam))
+
+class VoteRef(generics.GenericAPIView):
+    queryset = Ref.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk=None):
+        if not pk: return Response(False)
+        if not Ref.objects.filter(pk=pk).exists():
+            return Response(False)
+        if not 'voteparam' in request.data.keys():
+            return Response(False)
+        ref = Ref.objects.filter(pk=pk).first()
+        voteparam = request.data['voteparam']
+        if voteparam != '1' and voteparam != '-1' and voteparam != '0':
+            return Response(False)
+        return Response(ref.vote(request.user, voteparam))
 
 class GetRandomNode(generics.ListAPIView):
     queryset = Node.objects.all()
@@ -117,3 +147,15 @@ class AddRef(generics.CreateAPIView):
         serializer = self.get_serializer(instance)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class EditNode(generics.UpdateAPIView):
+    queryset = Node.objects.all()
+    serializer_class = NodeEditSerializer
+    permission_classes = [IsOwner]
+
+class EditRef(generics.UpdateAPIView):
+    queryset = Ref.objects.all()
+    serializer_class = RefEditSerializer
+    permission_classes = [IsOwner]
+
+# class VoteRef(generics.)

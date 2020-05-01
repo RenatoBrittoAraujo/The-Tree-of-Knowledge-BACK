@@ -56,9 +56,11 @@ class Node(models.Model):
             Edge(source=self, target=child).save()
 
     def vote(self, parent, user, voteparam):
+        voted = False
         if parent and self.incoming_edges.filter(source=parent).exists():
             edge = self.incoming_edges.filter(source=parent).first()
-            edge.vote(user, voteparam)
+            voted = edge.vote(user, voteparam)
+        return voted
 
 class Edge(models.Model):
     target = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='incoming_edges')
@@ -69,13 +71,14 @@ class Edge(models.Model):
         return self.source.name + ' -> ' + self.target.name
     
     def vote(self, user, voteparam):
+        old_votes = self.votes()
         if user.edgevotes.filter(edge=self).exists():
             vote = user.edgevotes.filter(edge=self).first()
             vote.voteparam = voteparam
             vote.save()
         else:
-            EdgeVote(edge=self, user=user, vote=voteparam).save()
-        return self.votes()
+            EdgeVote(edge=self, user=user, voteparam=voteparam).save()
+        return self.votes() != old_votes
     
     def votes(self):
         votes = self.edgevotes.all()
@@ -95,13 +98,14 @@ class Ref(models.Model):
         return self.title
     
     def vote(self, user, voteparam):
+        old_votes = self.votes()
         if user.refvotes.filter(ref=self).exists():
             vote = user.refvotes.filter(ref=self).first()
             vote.voteparam = voteparam
             vote.save()
         else:
-            RefVote(ref=self, user=user, vote=voteparam).save()
-        return self.votes()
+            RefVote(ref=self, user=user, voteparam=voteparam).save()
+        return self.votes() != old_votes
     
     def votes(self):
         votes = self.refvotes.all()
