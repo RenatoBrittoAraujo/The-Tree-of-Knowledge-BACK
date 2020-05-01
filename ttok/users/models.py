@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from .managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_('email address'), unique=True)
+    email = models.EmailField(_('email address'), unique=True, blank=False, null=False)
     username = models.CharField(_('user name'), max_length=40, blank=False, null=False)
     bio = models.CharField(_('user bio'), max_length=200, blank=True, null=True)
     contributionpoints = models.IntegerField(default=0)
@@ -23,6 +23,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
     
+    def __str__(self):
+        return self.username
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(User, self).save(*args, **kwargs)
+    
     def email_user(self, subject, message, from_email=None, **kwargs):
         '''
         Sends an email to this User.
@@ -32,3 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Contributions(models.Model):
     text = models.CharField(null=False, blank=True, max_length=200)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contributions')
+
+class UserReport(models.Model):
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_reported')
+    reportee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reports')

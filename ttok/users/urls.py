@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import (
+from .viewsets import (
     UserRegister,
     UserProfile,
     UserUpdateProfile,
@@ -11,7 +11,7 @@ appname = 'users'
 
 urlpatterns = [
     path(
-        'register',
+        r'register/',
         UserRegister.as_view(),
         name='register'
     ),
