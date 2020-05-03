@@ -146,7 +146,7 @@ class AddRef(generics.CreateAPIView):
 class EditNode(generics.UpdateAPIView):
     queryset = Node.objects.all()
     serializer_class = NodeEditSerializer
-    permission_classes = [IsOwner]
+    permission_classes = [permissions.IsAuthenticated]
 
 class EditRef(generics.UpdateAPIView):
     queryset = Ref.objects.all()

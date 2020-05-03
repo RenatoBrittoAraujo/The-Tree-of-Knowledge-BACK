@@ -3,10 +3,14 @@ from rest_framework import serializers
 from .models import Node, Ref, Edge
 
 class RefSerializer(serializers.ModelSerializer):
+    
+    author = serializers.CharField(source='author.username', read_only=True)
+    votes = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Ref
-        fields = ['id', 'title', 'link', 'node']
-        read_only_fields = ['id']
+        fields = ['id', 'title', 'link', 'node', 'author', 'votes']
+        read_only_fields = ['id', 'author', 'votes']
 
 class FullNodeSerializer(serializers.ModelSerializer):
 
