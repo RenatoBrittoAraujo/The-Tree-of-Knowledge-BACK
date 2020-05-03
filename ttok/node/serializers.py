@@ -12,11 +12,12 @@ class FullNodeSerializer(serializers.ModelSerializer):
 
     votes = serializers.IntegerField(source='get_votes', read_only=True)
     refs = RefSerializer(many=True, read_only=True)
+    author = serializers.CharField(source='author.username', read_only=True)
 
     class Meta:
         model = Node
-        fields = ['id', 'name', 'body', 'votes', 'refs']
-        read_only_fields = ['id', 'votes', 'refs']
+        fields = ['id', 'name', 'body', 'votes', 'refs', 'author']
+        read_only_fields = ['id', 'votes', 'refs', 'author']
 
 class QueryNodeSerializer(serializers.ModelSerializer):
     class Meta:

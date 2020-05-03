@@ -79,6 +79,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 class UsernameSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        filds = [
+        fields = [
             'username'
         ]
+        read_only = True

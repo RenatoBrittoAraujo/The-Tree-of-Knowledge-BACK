@@ -94,11 +94,6 @@ class ReportNode(generics.RetrieveAPIView):
         reported = instance.report(request.user)
         return Response(reported)
 
-class EditNode(generics.UpdateAPIView):
-    queryset = Node.objects.all()
-    serializer_class = FullNodeSerializer
-    permission_classes = [IsOwner]
-
 class AddNode(generics.CreateAPIView):
     queryset = Node.objects.all()
     serializer_class = FullNodeSerializer

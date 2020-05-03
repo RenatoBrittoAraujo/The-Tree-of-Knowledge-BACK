@@ -1,10 +1,10 @@
-from rest_framework import viewsets, permissions, mixins
+from rest_framework import viewsets, permissions, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 
-from .models import User
+from .models import User, UserReport
 
 from .serializers import (
     UserRegisterSerializer,
@@ -33,18 +33,32 @@ class UserProfile(generics.RetrieveAPIView):
     lookup_field = 'username'
 
 class UserUpdateProfile(generics.UpdateAPIView):
-    permission_classes = (IsOwner, )
+    permission_classes = (permissions.AllowAny, )
     serializer_class = UserProfileUpdateSerializer
     queryset = User.objects.all()
 
     lookup_field = 'username'
 
 class GetUsername(generics.RetrieveAPIView):
-    permission_classes = (IsOwner, )
+    permission_classes = (permissions.IsAuthenticated, )
     serializer_class = UsernameSerializer
     queryset = User.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.request.user.username
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        username = self.request.user.username
+        return Response(username)
+
+class ReportUser(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = UsernameSerializer
+    queryset = User.objects.all()
+
+    lookup_field = 'username'
+
+    def retrieve(self, request, *args, **kwargs):
+        reporter = self.request.user
+        reportee = self.get_object()
+        if reportee.report(reporter):
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

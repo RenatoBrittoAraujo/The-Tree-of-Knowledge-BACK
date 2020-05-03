@@ -4,7 +4,8 @@ from .viewsets import (
     UserRegister,
     UserProfile,
     UserUpdateProfile,
-    GetUsername
+    GetUsername,
+    ReportUser
 )
 
 appname = 'users'
@@ -30,4 +31,9 @@ urlpatterns = [
         GetUsername.as_view(),
         name='getusername'
     ),
+    path(
+        r'reportuser/<str:username>',
+        ReportUser.as_view(),
+        name='reportuser'
+    )
 ]

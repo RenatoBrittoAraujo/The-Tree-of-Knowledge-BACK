@@ -36,6 +36,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def report(self, reporter):
+        if not reporter:
+            return False
+        if UserReport.objects.filter(reportee=self, reporter=reporter).exists():
+            return False
+        UserReport(reporter=reporter, reportee=self).save()
+        return True
+
 class Contributions(models.Model):
     text = models.CharField(null=False, blank=True, max_length=200)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contributions')
