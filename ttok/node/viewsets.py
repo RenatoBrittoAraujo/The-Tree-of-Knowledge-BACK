@@ -42,21 +42,10 @@ class VoteNode(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk=None):
-        if not pk: return Response(False)
-        if not Node.objects.filter(pk=pk).exists():
-            return Response(False)
-        if not 'parent' in request.data.keys():
-            return Response(False)
-        if not 'voteparam' in request.data.keys():
-            return Response(False)
         node = Node.objects.filter(pk=pk).first()
         parent = request.data['parent']
         voteparam = request.data['voteparam']
-        if not Node.objects.filter(pk=parent).exists():
-            return Response(False)
         parent = Node.objects.filter(pk=parent).first()
-        if voteparam != '1' and voteparam != '-1' and voteparam != '0':
-            return Response(False)
         return Response(node.vote(parent, request.user, voteparam))
 
 class VoteRef(generics.GenericAPIView):
@@ -64,15 +53,15 @@ class VoteRef(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk=None):
-        if not pk: return Response(False)
+        if not pk: return Response('no pk')
         if not Ref.objects.filter(pk=pk).exists():
-            return Response(False)
+            return Response('no ref obj')
         if not 'voteparam' in request.data.keys():
-            return Response(False)
+            return Response('no voteparam')
         ref = Ref.objects.filter(pk=pk).first()
         voteparam = request.data['voteparam']
         if voteparam != '1' and voteparam != '-1' and voteparam != '0':
-            return Response(False)
+            return Response('invalid vote param')
         return Response(ref.vote(request.user, voteparam))
 
 class GetRandomNode(generics.ListAPIView):
@@ -152,5 +141,4 @@ class EditRef(generics.UpdateAPIView):
     queryset = Ref.objects.all()
     serializer_class = RefEditSerializer
     permission_classes = [IsOwner]
-
-# class VoteRef(generics.)
+        
