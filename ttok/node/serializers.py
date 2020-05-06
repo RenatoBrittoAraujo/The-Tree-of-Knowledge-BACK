@@ -25,6 +25,16 @@ class RefSerializer(serializers.ModelSerializer):
             else:
                 return 0
 
+class RefEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ref
+        fields = ['title', 'link']
+
+class NodeEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Node
+        fields = ['name', 'body']
+
 class FullNodeSerializer(serializers.ModelSerializer):
 
     votes = serializers.IntegerField(source='get_votes', read_only=True)
@@ -72,8 +82,3 @@ class NodeEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = ['body']
-
-class RefEditSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ref
-        fields = ['title', 'link']
