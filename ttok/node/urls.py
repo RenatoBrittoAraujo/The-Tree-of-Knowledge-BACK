@@ -5,13 +5,16 @@ from .viewsets import (
     QueryNode,
     GetNode,
     GetRandomNode,
-    ReportNode,
-    AddNode,
+    EditRef,
     EditNode,
+    AddNode,
     AddEdge,
     AddRef,
     VoteNode,
-    VoteRef
+    VoteRef,
+    DeleteNode,
+    DeleteRef,
+    ReportNode,
 )
 
 appname = 'nodes'
@@ -66,5 +69,20 @@ urlpatterns = [
         r'voteref/<int:pk>',
         VoteRef.as_view(),
         name='voteref'
+    ),
+    path(
+        r'editref/<int:pk>',
+        EditRef.as_view(),
+        name='editref'
+    ),
+    path(
+        r'deletenode/<int:pk>',
+        DeleteNode.as_view(),
+        name='deletenode'
+    ),
+    path(
+        r'deleteref/<int:pk>',
+        DeleteRef.as_view(),
+        name='deleteref'
     ),
 ]

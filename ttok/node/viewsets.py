@@ -53,15 +53,8 @@ class VoteRef(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk=None):
-        if not pk: return Response('no pk')
-        if not Ref.objects.filter(pk=pk).exists():
-            return Response('no ref obj')
-        if not 'voteparam' in request.data.keys():
-            return Response('no voteparam')
         ref = Ref.objects.filter(pk=pk).first()
         voteparam = request.data['voteparam']
-        if voteparam != '1' and voteparam != '-1' and voteparam != '0':
-            return Response('invalid vote param')
         return Response(ref.vote(request.user, voteparam))
 
 class GetRandomNode(generics.ListAPIView):
@@ -141,4 +134,11 @@ class EditRef(generics.UpdateAPIView):
     queryset = Ref.objects.all()
     serializer_class = RefEditSerializer
     permission_classes = [IsOwner]
-        
+
+class DeleteNode(generics.DestroyAPIView):
+    queryset = Node.objects.all()
+    permission_classes = [IsOwner]
+
+class DeleteRef(generics.DestroyAPIView):
+    queryset = Ref.objects.all()
+    permission_classes = [IsOwner]

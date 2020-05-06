@@ -19,8 +19,9 @@ class RefSerializer(serializers.ModelSerializer):
         if current_user.is_anonymous:
             return 0
         else:
-            if current_user.refvotes.filter(ref=obj).exists():
-                return current_user.refvotes.filter(ref=obj).first().voteparam
+            vote = current_user.refvotes.filter(ref=obj)
+            if vote.exists():
+                return vote.first().voteparam
             else:
                 return 0
 
@@ -50,10 +51,7 @@ class FullNodeSerializer(serializers.ModelSerializer):
         if not edge.exists():
             return 0
         edge = edge.first()
-        print(edge.edgevotes.all())
-        print(current_user.edgevotes.all())
         targetVote = current_user.edgevotes.filter(edge=edge, user=current_user)
-        print(targetVote.exists(), 'vote exists')
         if targetVote.exists():
             return targetVote.first().voteparam
         else:
@@ -77,5 +75,5 @@ class NodeEditSerializer(serializers.ModelSerializer):
 
 class RefEditSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Node
+        model = Ref
         fields = ['title', 'link']
