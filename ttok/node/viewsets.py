@@ -31,9 +31,9 @@ class NodeViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         action = self.action
-        if action in ['create', 'vote', 'report']:
+        if action in ['create', 'vote', 'report', 'update', 'partial_update']:
             permission_classes = [permissions.IsAuthenticated]
-        elif action in ['update', 'partial_update', 'destroy']:
+        elif action in ['destroy']:
             permission_classes = [IsOwner]
         elif action in ['retrieve', 'query', 'list', 'search']:
             permission_classes = [permissions.AllowAny]
@@ -57,6 +57,10 @@ class NodeViewSet(viewsets.ModelViewSet):
             nodeBody = nodeData['body']
         node = Node(name=nodeName, body=nodeBody, author=request.user)
         node.save()
+        node.author.add_contribution(
+            'Created node ' + node.name
+        )
+        node.author.add_contribution_points(+1)
         serializer = self.get_serializer(node)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -124,6 +128,10 @@ class RefViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = Ref.objects.create(author=request.user, **serializer.validated_data)
+        instance.author.add_contribution(
+            'Create reference ' + instance.title[:20]
+        )
+        instance.author.add_contribution_points(+1)
         serializer = self.get_serializer(instance)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from .models import User
+from .models import User, Contributions
 from rest_framework.validators import UniqueValidator
 
 class UserRegisterSerializer(serializers.Serializer):
@@ -59,7 +59,15 @@ class UserRegisterSerializer(serializers.Serializer):
 
         return user
 
+class ContributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contributions
+        fields = ['text']
+
 class UserProfileSerializer(serializers.ModelSerializer):
+
+    contributions = ContributionSerializer(many=True)
+
     class Meta:
         model = User
         fields = [

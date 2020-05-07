@@ -78,6 +78,7 @@ class Edge(models.Model):
             vote.save()
         else:
             EdgeVote(edge=self, user=user, voteparam=voteparam).save()
+        self.target.author.add_contribution_points(self.votes() - old_votes)
         return self.votes() != old_votes
     
     def votes(self):
@@ -105,6 +106,7 @@ class Ref(models.Model):
             vote.save()
         else:
             RefVote(ref=self, user=user, voteparam=voteparam).save()
+        self.author.add_contribution_points(self.votes() - old_votes)
         return self.votes() != old_votes
     
     def votes(self):

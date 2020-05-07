@@ -43,6 +43,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         UserReport(reporter=reporter, reportee=self).save()
         return True
+    
+    def add_contribution(self, contribution_text):
+        Contributions(text=contribution_text, user=self).save()
+
+    def add_contribution_points(self, points):
+        self.contributionpoints = self.contributionpoints + int(points)
+        self.save()
 
 class Contributions(models.Model):
     text = models.CharField(null=False, blank=True, max_length=200)
