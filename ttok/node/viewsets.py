@@ -1,11 +1,13 @@
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import (
     permissions, mixins, 
     filters, generics, status,
-    viewsets,
+    viewsets, filters,
 )
-from rest_framework.decorators import action
+from django.db.models import Q
 import random
+
 from .models import Ref, Node, Edge
 
 from .permissions import (
@@ -21,21 +23,19 @@ from .serializers import (
     RefEditSerializer
 )
 
-# NODE SEARCH - https://medium.com/quick-code/searchfilter-using-django-and-vue-js-215af82e12cd
-
 class NodeViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = FullNodeSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'body')
 
     def get_permissions(self):
-        if self.action == 'create' or self.action == 'vote' or\
-           self.action == 'report':
+        action = self.action
+        if action in ['create', 'vote', 'report']:
             permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'update' or self.action == 'partial_update' or\
-             self.action == 'destroy':
+        elif action in ['update', 'partial_update', 'destroy']:
             permission_classes = [IsOwner]
-        elif self.action == 'retrieve' or self.action == 'query' or\
-             self.action == 'list':
+        elif action in ['retrieve', 'query', 'list', 'search']:
             permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -43,7 +43,7 @@ class NodeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self): 
         serializer_class = self.serializer_class 
-        if self.request.method == 'PUT' or self.request.method == 'PATCH': 
+        if self.request.method in ['PUT', 'PATCH']: 
             serializer_class = NodeEditSerializer 
         return serializer_class
 
@@ -65,6 +65,17 @@ class NodeViewSet(viewsets.ModelViewSet):
         instance = random.choice(self.get_queryset())
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='search/(?P<search_term>[^/.]+)')
+    def search(self, request, search_term=None):
+        if len(search_term) == 0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        fullset = self.get_queryset()
+        queryset = fullset.filter(name__startswith=search_term)
+        if queryset.count() < 10:
+            other_queryset = fullset.filter(name__contains=search_term)
+            queryset = queryset.union(other_queryset)
+        return Response(QueryNodeSerializer(queryset[:10], many=True).data)
 
     @action(detail=True, methods=['get'])
     def report(self, request, pk=None):
