@@ -154,8 +154,15 @@ class AddEdge(generics.CreateAPIView):
         data = serializer.validated_data
         target = data['target']
         source = data['source']
+
+        err400 = status.HTTP_400_BAD_REQUEST
+        if target == source:
+            return Response('Cannot connect a node to itself', status=err400)
         if Edge.objects.filter(target=target, source=source).exists():
-            return Response(False, status=status.HTTP_400_BAD_REQUEST)
+            return Response('Edge already exists', status=err400)
+        # if Edge.objects.filter(target=source, source=target).exists():
+        #     return Response('Reverse edge already exists', status=err400)
+
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
