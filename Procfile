@@ -1,1 +1,1 @@
-web: gunicorn ttok.ttok.wsgi --log-file -
+web: gunicorn ttok.wsgi --log-file -
