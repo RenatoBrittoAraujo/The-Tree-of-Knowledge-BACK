@@ -46,10 +46,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-ALLOWED_HOSTS = ['*']
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -68,6 +64,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'ttok.urls'
 

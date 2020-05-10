@@ -79,6 +79,9 @@ class NodeViewSet(viewsets.ModelViewSet):
         if queryset.count() < 10:
             other_queryset = fullset.filter(name__contains=search_term)
             queryset = queryset.union(other_queryset)
+        if queryset.count() < 10:
+            other_queryset = fullset.filter(name__icontains=search_term)
+            queryset = queryset.union(other_queryset)
         return Response(QueryNodeSerializer(queryset[:10], many=True).data)
 
     @action(detail=True, methods=['get'])
