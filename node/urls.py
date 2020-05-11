@@ -3,22 +3,18 @@ from rest_framework import routers
 from rest_framework.routers import DefaultRouter
 
 from .viewsets import (
-    AddEdge,
     NodeViewSet,
-    RefViewSet
+    RefViewSet,
+    EdgeViewSet
 )
 
 router = DefaultRouter()
 router.register(r'nodes', NodeViewSet)
 router.register(r'refs', RefViewSet)
+router.register(r'edges', EdgeViewSet)
 
 appname = 'nodes'
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(
-        r'addedge/',
-        AddEdge.as_view(),
-        name='addedge'
-    ),
 ]

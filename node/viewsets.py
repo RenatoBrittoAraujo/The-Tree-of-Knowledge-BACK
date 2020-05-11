@@ -146,26 +146,36 @@ class RefViewSet(viewsets.ModelViewSet):
         return Response(ref.vote(request.user, voteparam))
         
 
-class AddEdge(generics.CreateAPIView):
+class EdgeViewSet(  viewsets.GenericViewSet,
+                    mixins.CreateModelMixin):
     queryset = Edge.objects.all()
     serializer_class = EdgeSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
+    permission_classes = [permissions.AllowAny]
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         target = data['target']
         source = data['source']
-
         err400 = status.HTTP_400_BAD_REQUEST
         if target == source:
             return Response('Cannot connect a node to itself', status=err400)
         if Edge.objects.filter(target=target, source=source).exists():
             return Response('Edge already exists', status=err400)
-        # if Edge.objects.filter(target=source, source=target).exists():
-        #     return Response('Reverse edge already exists', status=err400)
-
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(detail=False, methods=['post'])
+    def delete(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        target = data['target']
+        source = data['source']
+        err400 = status.HTTP_400_BAD_REQUEST
+        if not Edge.objects.filter(target=target, source=source).exists():
+            return Response('Edge does not exist', status=err400)
+        Edge.objects.filter(target=target, source=source).first().delete()
+        return Response(status=status.HTTP_200_OK)
